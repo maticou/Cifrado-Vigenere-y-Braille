@@ -157,10 +157,10 @@ public class CifradoVigenere {
                     listaTextoBinario = new TextoABinario(listaTextoCifrado).getTextoBinary();
                     listaTextoBraille = new TextoABraille(listaTextoCifrado).getTextoBrailleBinario();
                     
-                    mostrarLista(listaOrdenOriginal, "String de orden");
-                    mostrarLista(listaTextoCifrado, "Mensaje cifrado");
-                    mostrarLista(listaTextoBinario, "Mensaje cifrado en binario");
-                    mostrarLista(listaTextoBraille, "Mensaje Braille en binario");
+                    mostrarLista(listaOrdenOriginal, "String de orden",0);
+                    mostrarLista(listaTextoCifrado, "Mensaje cifrado",0);
+                    mostrarLista(listaTextoBinario, "Mensaje cifrado en binario",1);
+                    mostrarLista(listaTextoBraille, "Mensaje Braille en binario",0);
                     
                     int ciclos = listaTextoBraille.size()/6;
                     
@@ -175,6 +175,7 @@ public class CifradoVigenere {
                         listaDeMatrices.add(new Matriz(miniLista));
                     }
                     
+                    System.out.println(""); 
                     for(int d=0; d<listaDeMatrices.size(); d++){
                         listaDeMatrices.get(d).imprimirMatriz();
                         System.out.println("");
@@ -232,11 +233,25 @@ public class CifradoVigenere {
         }
     }
 
-    private static void mostrarLista(ArrayList lista, String nombre) {
-        System.out.print(nombre+": ");
-        for(int i=0; i<lista.size(); i++){
-            System.out.print(lista.get(i));
-        }
-        System.out.println("");
+    private static void mostrarLista(ArrayList lista, String nombre, int bandera) {
+        if(bandera == 1){
+            System.out.print(nombre+": ");
+            int contador = 0;
+            for(int i=0; i<lista.size(); i++){
+                if(contador == listaTextoOriginal.size()){
+                    System.out.print(" ");
+                    contador = 0;
+                }
+                System.out.print(lista.get(i));
+                contador++;
+            }
+            System.out.println("");
+        }else{
+            System.out.print(nombre+": ");
+            for(int i=0; i<lista.size(); i++){
+                System.out.print(lista.get(i));
+            }
+            System.out.println("");
+        }        
     }  
 }

@@ -89,10 +89,19 @@ public class Matriz {
         }  
     }
     
-    public void imprimirMatriz(){
+    public void imprimirMatriz(){        
         for(int i=0; i<3; i++){
             for(int j=0; j<2; j++){
                 System.out.print(this.matriz[i][j]);                
+            }
+            System.out.print("    ");
+            for(int k=0; k<2; k++){
+                if(this.matriz[i][k] == 1){
+                    System.out.print("*");
+                }else{
+                    System.out.print(" ");
+                }
+                                
             }
             System.out.println(""); 
         }
