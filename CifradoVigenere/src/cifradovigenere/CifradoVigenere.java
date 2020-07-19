@@ -160,7 +160,7 @@ public class CifradoVigenere {
                     mostrarLista(listaOrdenOriginal, "String de orden",0);
                     mostrarLista(listaTextoCifrado, "Mensaje cifrado",0);
                     mostrarLista(listaTextoBinario, "Mensaje cifrado en binario",1);
-                    mostrarLista(listaTextoBraille, "Mensaje Braille en binario",0);
+                    mostrarLista(listaTextoBraille, "Mensaje Braille en binario",2);
                     
                     int ciclos = listaTextoBraille.size()/6;
                     
@@ -194,9 +194,80 @@ public class CifradoVigenere {
     }
 
     private static void descifrar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String textoCifrado = "";        
+        Scanner text = new Scanner(System.in);
+        System.out.println("\nIngrese el texto cifrado (SOLO SE PERMITEN LETRAS DEL ALFABETO INGLÉS)\n");
+        if(text.hasNextLine()){
+            textoCifrado = text.nextLine();
+            for (char c : textoCifrado.toCharArray()) {
+                if((c>64 && c<91) || (c>96 && c<123)){
+                    listaTextoCifrado.add(Character.toLowerCase(c));
+                }else{
+                    System.out.println("\nINGRESE UNA PALABRA SOLO CON LETRAS VÁLIDAS!!!\n");
+                    exit(0);
+                }                
+            } 
+            
+            String clave = "";        
+            Scanner text2 = new Scanner(System.in);
+            System.out.println("\nIngrese la clave de cifrado (SOLO SE PERMITEN LETRAS DEL ALFABETO INGLÉS)\n");
+            if(text2.hasNextLine()){
+                clave = text2.nextLine();
+                for (char c : clave.toCharArray()) {
+                    if((c>64 && c<91) || (c>96 && c<123)){
+                        listaClaveOriginal.add(Character.toLowerCase(c));
+                    }else{
+                        System.out.println("\nINGRESE UNA PALABRA SOLO CON LETRAS VÁLIDAS!!!\n");
+                        exit(0);
+                    }                
+                } 
+                
+                int claveSize = listaClaveOriginal.size();
+                int contador = 0;
+                for(int a=claveSize; a<listaTextoCifrado.size(); a++){
+                    if(contador < claveSize){
+                        listaClaveOriginal.add(listaClaveOriginal.get(contador));
+                        contador++;
+                    }else{
+                        contador = 0;
+                        listaClaveOriginal.add(listaClaveOriginal.get(contador));
+                        contador++;
+                    }
+                }                
+                //mostrarLista(listaTextoCifrado, "Mensaje cifrado",0);
+                //mostrarLista(listaClaveOriginal, "Clave de cifrado",0);                
+                
+                descifrarTexto();
+                
+                System.out.println("");
+                System.out.println("");
+                mostrarLista(listaTextoOriginal, "Texto original",0);
+                
+            }else{
+                System.out.println("\nINGRESE UNA PALABRA VÁLIDA!!!\n");
+            }   
+        }else{
+            System.out.println("\nINGRESE UNA PALABRA VÁLIDA!!!\n");
+        }                  
     }
-    
+        
+    private static void descifrarTexto() {
+        for(int a=0; a<listaClaveOriginal.size(); a++){
+            for(int i=0; i<26; i++){
+                if(matriz[i][0] == listaClaveOriginal.get(a)){
+                    for(int j=0; j<26; j++){
+                        if(matriz[i][j] == listaTextoCifrado.get(a)){
+                            listaTextoOriginal.add(matriz[0][j]);
+                        }else{
+                            
+                        }
+                    }
+                }else{
+                    
+                }                
+            }
+        }
+    }
         
     private static void llenarLista() {
         for(int i=0; i<2; i++){
@@ -246,12 +317,25 @@ public class CifradoVigenere {
                 contador++;
             }
             System.out.println("");
+        }
+        else if(bandera == 2){
+            System.out.print(nombre+": ");
+            int contador = 0;
+            for(int i=0; i<lista.size(); i++){
+                if(contador == 6){
+                    System.out.print(" ");
+                    contador = 0;
+                }
+                System.out.print(lista.get(i));
+                contador++;
+            }
+            System.out.println("");
         }else{
             System.out.print(nombre+": ");
             for(int i=0; i<lista.size(); i++){
                 System.out.print(lista.get(i));
             }
             System.out.println("");
-        }        
-    }  
+        }       
+    }      
 }
