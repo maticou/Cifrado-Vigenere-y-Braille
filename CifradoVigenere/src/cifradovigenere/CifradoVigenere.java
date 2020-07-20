@@ -5,7 +5,6 @@
  */
 package cifradovigenere;
 
-import java.io.UnsupportedEncodingException;
 import static java.lang.System.exit;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -19,11 +18,14 @@ public class CifradoVigenere {
     static public char matriz[][] = new char[26][26];
     static ArrayList<Character> listaTextoOriginal;
     static ArrayList<Character> listaClaveOriginal;
+    static ArrayList<Character> listaClaveOriginalCorta;
     static ArrayList<Character> listaOrdenOriginal;
     static ArrayList<Character> listaTextoCifrado;
     static ArrayList<Integer> listaTextoBinario;
     static ArrayList<Integer> listaTextoBraille;
+    static ArrayList<Integer> listaClaveBraille;
     static ArrayList<Matriz> listaDeMatrices;
+    static ArrayList<Matriz> listaDeMatrices2;
     static public ArrayList<Character> listaDeLetras;
     static public ArrayList<Character> listaDeLetras2;
     /**
@@ -41,11 +43,14 @@ public class CifradoVigenere {
             
             listaTextoOriginal = new ArrayList<>();
             listaClaveOriginal = new ArrayList<>();
+            listaClaveOriginalCorta = new ArrayList<>();
             listaOrdenOriginal = new ArrayList<>();
             listaTextoCifrado = new ArrayList<>();
             listaTextoBinario = new ArrayList();
             listaTextoBraille = new ArrayList();
+            listaClaveBraille = new ArrayList();
             listaDeMatrices = new ArrayList();
+            listaDeMatrices2 = new ArrayList();
             listaDeLetras = new ArrayList<>();
             listaDeLetras2 = new ArrayList<>();
             
@@ -106,6 +111,7 @@ public class CifradoVigenere {
                 for (char c : clave.toCharArray()) {
                     if((c>64 && c<91) || (c>96 && c<123)){
                         listaClaveOriginal.add(Character.toLowerCase(c));
+                        listaClaveOriginalCorta.add(Character.toLowerCase(c));
                     }else{
                         System.out.println("\nINGRESE UNA PALABRA SOLO CON LETRAS VÁLIDAS!!!\n");
                         exit(0);
@@ -127,17 +133,23 @@ public class CifradoVigenere {
 
                 String orden = "";        
                 Scanner text3 = new Scanner(System.in);
-                System.out.println("\nIngrese el string de orden para cifrar (SOLO SE PERMITEN NÚMEROS DEL 0-9, SIN ESPACIOS Y EN LAS UNIDADES)\n");
+                System.out.println("\nIngrese el string de orden para cifrar (SOLO SE PERMITEN 6 NÚMEROS DEL 1-6 EN CUALQUIER ORDEN, SIN ESPACIOS Y EN LAS UNIDADES)\n");
                 if(text3.hasNextLine()){
                     orden = text3.nextLine();
                     for (char c : orden.toCharArray()) {
-                        if((c>47 && c<58)){
+                        if((c>48 && c<55)){
                             listaOrdenOriginal.add(c);
                         }else{
                             System.out.println("\nINGRESE SOLO NÚMEROS VÁLIDOS!!!\n");
                             exit(0);
                         }                
-                    }                                           
+                    }     
+                    
+                    if(listaOrdenOriginal.size() != 6){
+                        System.out.println("\nINGRESE SOLO 6 NÚMEROS VÁLIDOS!!!\n");
+                        exit(0);
+                    }
+                    
                     System.out.println("");
                     int indexX = 0;
                     int indexY = 0;
@@ -149,18 +161,7 @@ public class CifradoVigenere {
                         indexY = 0;
                     }
                     
-                    /*mostrarLista(listaTextoOriginal, "listaTextoOriginal");
-                    mostrarLista(listaClaveOriginal, "listaClaveOriginal");
-                    mostrarLista(listaOrdenOriginal, "listaOrdenOriginal");
-                    mostrarLista(listaTextoCifrado, "listaTextoCifrado");*/
-                    
-                    listaTextoBinario = new TextoABinario(listaTextoCifrado).getTextoBinary();
-                    listaTextoBraille = new TextoABraille(listaTextoCifrado).getTextoBrailleBinario();
-                    
-                    mostrarLista(listaOrdenOriginal, "String de orden",0);
-                    mostrarLista(listaTextoCifrado, "Mensaje cifrado",0);
-                    mostrarLista(listaTextoBinario, "Mensaje cifrado en binario",1);
-                    mostrarLista(listaTextoBraille, "Mensaje Braille en binario",2);
+                    listaTextoBraille = new TextoABraille(listaTextoCifrado).getTextoBrailleBinario();                    
                     
                     int ciclos = listaTextoBraille.size()/6;
                     
@@ -175,9 +176,38 @@ public class CifradoVigenere {
                         listaDeMatrices.add(new Matriz(miniLista));
                     }
                     
-                    System.out.println(""); 
+                    
+                    
+                    listaClaveBraille = new TextoABraille(listaClaveOriginalCorta).getTextoBrailleBinario();                    
+                    
+                    int ciclos2 = listaClaveBraille.size()/6;
+                    
+                    for(int b=0; b<ciclos2; b++){
+                        ArrayList<Integer> miniLista = new ArrayList();
+                        miniLista.add(listaClaveBraille.get((b*6)+0));
+                        miniLista.add(listaClaveBraille.get((b*6)+1));
+                        miniLista.add(listaClaveBraille.get((b*6)+2));
+                        miniLista.add(listaClaveBraille.get((b*6)+3));
+                        miniLista.add(listaClaveBraille.get((b*6)+4));
+                        miniLista.add(listaClaveBraille.get((b*6)+5));
+                        listaDeMatrices2.add(new Matriz(miniLista));
+                    }
+                    
+                    permutarBraille();
+                    
+                    mostrarLista(listaOrdenOriginal, "String de orden",0);
+                    mostrarLista(listaTextoBinario, "Mensaje cifrado",1);
+                    mostrarLista(listaClaveBraille, "Clave Braille",2);
+                    
+                    System.out.println("Mensaje cifrado"); 
                     for(int d=0; d<listaDeMatrices.size(); d++){
                         listaDeMatrices.get(d).imprimirMatriz();
+                        System.out.println("");
+                    }
+                    
+                    System.out.println("Clave en Braille"); 
+                    for(int d=0; d<listaDeMatrices2.size(); d++){
+                        listaDeMatrices2.get(d).imprimirMatriz();
                         System.out.println("");
                     }
                     
@@ -196,52 +226,68 @@ public class CifradoVigenere {
     private static void descifrar() {
         String textoCifrado = "";        
         Scanner text = new Scanner(System.in);
-        System.out.println("\nIngrese el texto cifrado (SOLO SE PERMITEN LETRAS DEL ALFABETO INGLÉS)\n");
+        System.out.println("\nIngrese el texto cifrado (SOLO SE PERMITEN 1, 0 Y ESPACIOS)\n");
         if(text.hasNextLine()){
             textoCifrado = text.nextLine();
             for (char c : textoCifrado.toCharArray()) {
-                if((c>64 && c<91) || (c>96 && c<123)){
+                if((c>47 && c<50) || (c>21 && c<33)){
                     listaTextoCifrado.add(Character.toLowerCase(c));
                 }else{
-                    System.out.println("\nINGRESE UNA PALABRA SOLO CON LETRAS VÁLIDAS!!!\n");
+                    System.out.println("\nINGRESE UN TEXTO VÁLIDO!!!\n");
                     exit(0);
                 }                
             } 
             
             String clave = "";        
             Scanner text2 = new Scanner(System.in);
-            System.out.println("\nIngrese la clave de cifrado (SOLO SE PERMITEN LETRAS DEL ALFABETO INGLÉS)\n");
+            System.out.println("\nIngrese la clave de cifrado (SOLO SE PERMITEN 1, 0 Y ESPACIOS)\n");
             if(text2.hasNextLine()){
                 clave = text2.nextLine();
                 for (char c : clave.toCharArray()) {
                     if((c>64 && c<91) || (c>96 && c<123)){
                         listaClaveOriginal.add(Character.toLowerCase(c));
                     }else{
-                        System.out.println("\nINGRESE UNA PALABRA SOLO CON LETRAS VÁLIDAS!!!\n");
+                        System.out.println("\nINGRESE UN TEXTO VÁLIDO!!!\n");
                         exit(0);
                     }                
                 } 
-                
-                int claveSize = listaClaveOriginal.size();
-                int contador = 0;
-                for(int a=claveSize; a<listaTextoCifrado.size(); a++){
-                    if(contador < claveSize){
-                        listaClaveOriginal.add(listaClaveOriginal.get(contador));
-                        contador++;
-                    }else{
-                        contador = 0;
-                        listaClaveOriginal.add(listaClaveOriginal.get(contador));
-                        contador++;
+
+                String orden = "";        
+                Scanner text3 = new Scanner(System.in);
+                System.out.println("\nIngrese el string de orden para cifrar (SOLO SE PERMITEN 6 NÚMEROS DEL 1-6 EN CUALQUIER ORDEN, SIN ESPACIOS Y EN LAS UNIDADES)\n");
+                if(text3.hasNextLine()){
+                    orden = text3.nextLine();
+                    for (char c : orden.toCharArray()) {
+                        if((c>48 && c<55)){
+                            listaOrdenOriginal.add(c);
+                        }else{
+                            System.out.println("\nINGRESE SOLO NÚMEROS VÁLIDOS!!!\n");
+                            exit(0);
+                        }                
+                    }     
+                    
+                    if(listaOrdenOriginal.size() != 6){
+                        System.out.println("\nINGRESE SOLO 6 NÚMEROS VÁLIDOS!!!\n");
+                        exit(0);
                     }
-                }                
-                //mostrarLista(listaTextoCifrado, "Mensaje cifrado",0);
-                //mostrarLista(listaClaveOriginal, "Clave de cifrado",0);                
-                
-                descifrarTexto();
-                
-                System.out.println("");
-                System.out.println("");
-                mostrarLista(listaTextoOriginal, "Texto original",0);
+                    
+                    System.out.println("");
+                    int indexX = 0;
+                    int indexY = 0;
+                    for(int i=0; i<listaTextoOriginal.size();i++){
+                        indexX = listaDeLetras2.indexOf(listaTextoOriginal.get(i));
+                        indexY = listaDeLetras2.indexOf(listaClaveOriginal.get(i));
+                        listaTextoCifrado.add(matriz[indexX][indexY]);
+                        indexX = 0;
+                        indexY = 0;
+                    }
+                    
+                    //aquí se continua!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    
+                    
+                }else{
+                    System.out.println("\nINGRESE UNA PALABRA VÁLIDA!!!\n");
+                }
                 
             }else{
                 System.out.println("\nINGRESE UNA PALABRA VÁLIDA!!!\n");
@@ -338,4 +384,33 @@ public class CifradoVigenere {
             System.out.println("");
         }       
     }      
+
+    private static void permutarBraille() {
+        for(int a=0; a<listaOrdenOriginal.size(); a++){
+            for(int i=0; i<listaDeMatrices.size(); i++){
+                if(null != listaOrdenOriginal.get(a))switch (listaOrdenOriginal.get(a)) {
+                    case '1':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(0, 0));
+                        break;
+                    case '2':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(0, 1));
+                        break;
+                    case '3':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(1, 0));
+                        break;
+                    case '4':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(1, 1));
+                        break;
+                    case '5':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(2, 0));
+                        break;
+                    case '6':
+                        listaTextoBinario.add(listaDeMatrices.get(i).getValorMatriz(2, 1));
+                        break;
+                    default:
+                        break;
+                }                
+            }
+        }        
+    }
 }
