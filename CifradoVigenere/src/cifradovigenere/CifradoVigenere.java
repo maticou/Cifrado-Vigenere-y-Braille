@@ -17,15 +17,18 @@ public class CifradoVigenere {
 
     static public char matriz[][] = new char[26][26];
     static ArrayList<Character> listaTextoOriginal;
+    static ArrayList<Character> listaTextoOriginalFinal;
     static ArrayList<Character> listaClaveOriginal;
     static ArrayList<Character> listaClaveOriginalCorta;
     static ArrayList<Character> listaOrdenOriginal;
     static ArrayList<Character> listaTextoCifrado;
     static ArrayList<Integer> listaTextoBinario;
+    static ArrayList<Integer> listaBrailleBinario;
     static ArrayList<Integer> listaTextoBraille;
     static ArrayList<Integer> listaClaveBraille;
     static ArrayList<Matriz> listaDeMatrices;
     static ArrayList<Matriz> listaDeMatrices2;
+    static ArrayList<Integer>[] al;
     static public ArrayList<Character> listaDeLetras;
     static public ArrayList<Character> listaDeLetras2;
     /**
@@ -42,17 +45,20 @@ public class CifradoVigenere {
             System.out.print("3.- Salir \n");
             
             listaTextoOriginal = new ArrayList<>();
+            listaTextoOriginalFinal = new ArrayList<>();
             listaClaveOriginal = new ArrayList<>();
             listaClaveOriginalCorta = new ArrayList<>();
             listaOrdenOriginal = new ArrayList<>();
             listaTextoCifrado = new ArrayList<>();
             listaTextoBinario = new ArrayList();
+            listaBrailleBinario = new ArrayList();
             listaTextoBraille = new ArrayList();
-            listaClaveBraille = new ArrayList();
+            listaClaveBraille = new ArrayList();            
             listaDeMatrices = new ArrayList();
             listaDeMatrices2 = new ArrayList();
             listaDeLetras = new ArrayList<>();
             listaDeLetras2 = new ArrayList<>();
+            al = new ArrayList[6];
             
             llenarLista();
             llenarLista2();
@@ -199,7 +205,7 @@ public class CifradoVigenere {
                     mostrarLista(listaTextoBinario, "Mensaje cifrado",1);
                     mostrarLista(listaClaveBraille, "Clave Braille",2);
                     
-                    System.out.println("Mensaje cifrado"); 
+                    System.out.println("\nMensaje cifrado"); 
                     for(int d=0; d<listaDeMatrices.size(); d++){
                         listaDeMatrices.get(d).imprimirMatriz();
                         System.out.println("");
@@ -243,9 +249,11 @@ public class CifradoVigenere {
             System.out.println("\nIngrese la clave de cifrado (SOLO SE PERMITEN 1, 0 Y ESPACIOS)\n");
             if(text2.hasNextLine()){
                 clave = text2.nextLine();
-                for (char c : clave.toCharArray()) {
-                    if((c>64 && c<91) || (c>96 && c<123)){
+                String replaceAll = clave.replaceAll("\\s+","");
+                for (char c : replaceAll.toCharArray()) {
+                    if((c>47 && c<50) || (c>21 && c<33)){
                         listaClaveOriginal.add(Character.toLowerCase(c));
+                        listaClaveBraille.add(Character.getNumericValue(c));
                     }else{
                         System.out.println("\nINGRESE UN TEXTO VÁLIDO!!!\n");
                         exit(0);
@@ -269,20 +277,110 @@ public class CifradoVigenere {
                     if(listaOrdenOriginal.size() != 6){
                         System.out.println("\nINGRESE SOLO 6 NÚMEROS VÁLIDOS!!!\n");
                         exit(0);
+                    }                    
+                    
+                    ArrayList<Integer> lista1 = new ArrayList();
+                    ArrayList<Integer> lista2 = new ArrayList();
+                    ArrayList<Integer> lista3 = new ArrayList();
+                    ArrayList<Integer> lista4 = new ArrayList();
+                    ArrayList<Integer> lista5 = new ArrayList();
+                    ArrayList<Integer> lista6 = new ArrayList();
+                    int largo = listaTextoCifrado.size()/6;
+                    int numeroLista = 1;
+                    for(int i=0; i<listaTextoCifrado.size(); i++){
+                        if(i<largo){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista1.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }                            
+                        }
+                        else if(i<(largo*2)+1 && i>largo){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista2.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }  
+                        }
+                        else if(i<(largo*3)+2 && i>largo*2){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista3.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }  
+                        }
+                        else if(i<(largo*4)+3 && i>largo*3){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista4.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }  
+                        }
+                        else if(i<(largo*5)+4 && i>largo*4){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista5.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }  
+                        }
+                        else if(i<(largo*6)+5 && i>largo*5){
+                            if(listaTextoCifrado.get(i) != ' '){
+                                lista6.add(Character.getNumericValue(listaTextoCifrado.get(i)));
+                            }  
+                        }else{
+                            
+                        }
                     }
                     
+                    for(int b=0; b<listaOrdenOriginal.size(); b++){
+                        if(null == listaOrdenOriginal.get(b)){
+                            
+                        }
+                        else switch (listaOrdenOriginal.get(b)) {
+                            case '1':
+                                al[b] = lista1;
+                                break;
+                            case '2':
+                                al[b] = lista2;
+                                break;
+                            case '3':
+                                al[b] = lista3;
+                                break;
+                            case '4':
+                                al[b] = lista4;
+                                break;
+                            case '5':
+                                al[b] = lista5;
+                                break;
+                            case '6':
+                                al[b] = lista6;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    
+                    //listaBrailleBinario
+                    for(int j=0; j<lista1.size(); j++){
+                        listaBrailleBinario.add(al[0].get(j));
+                        listaBrailleBinario.add(al[1].get(j));
+                        listaBrailleBinario.add(al[2].get(j));
+                        listaBrailleBinario.add(al[3].get(j));
+                        listaBrailleBinario.add(al[4].get(j));
+                        listaBrailleBinario.add(al[5].get(j));
+                    }
+
+                    listaTextoOriginal = new BrailleATexto(listaBrailleBinario).getTextoOriginal();
+                    listaClaveOriginal = new BrailleATexto(listaClaveBraille).getTextoOriginal();
+                    
+                    int claveSize = listaClaveOriginal.size();
+                    int contador = 0;
+                    for(int a=claveSize; a<listaTextoOriginal.size(); a++){
+                        if(contador < claveSize){
+                            listaClaveOriginal.add(listaClaveOriginal.get(contador));
+                            contador++;
+                        }else{
+                            contador = 0;
+                            listaClaveOriginal.add(listaClaveOriginal.get(contador));
+                            contador++;
+                        }
+                    }
+                    
+                    descifrarTexto();
+
                     System.out.println("");
-                    int indexX = 0;
-                    int indexY = 0;
-                    for(int i=0; i<listaTextoOriginal.size();i++){
-                        indexX = listaDeLetras2.indexOf(listaTextoOriginal.get(i));
-                        indexY = listaDeLetras2.indexOf(listaClaveOriginal.get(i));
-                        listaTextoCifrado.add(matriz[indexX][indexY]);
-                        indexX = 0;
-                        indexY = 0;
-                    }
-                    
-                    //aquí se continua!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    System.out.println("");
+                    mostrarLista(listaTextoOriginalFinal, "Texto original",0);
                     
                     
                 }else{
@@ -302,8 +400,8 @@ public class CifradoVigenere {
             for(int i=0; i<26; i++){
                 if(matriz[i][0] == listaClaveOriginal.get(a)){
                     for(int j=0; j<26; j++){
-                        if(matriz[i][j] == listaTextoCifrado.get(a)){
-                            listaTextoOriginal.add(matriz[0][j]);
+                        if(matriz[i][j] == listaTextoOriginal.get(a)){
+                            listaTextoOriginalFinal.add(matriz[0][j]);
                         }else{
                             
                         }
